@@ -8,10 +8,6 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 class LoginSpec extends Specification {
-	private static boolean isPortalInstance() {
-		true
-	}
-
 	@Shared
 	File dataFile = File.createTempFile("data", ".csv");
 
