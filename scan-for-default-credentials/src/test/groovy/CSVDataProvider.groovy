@@ -1,15 +1,15 @@
 class CSVDataProvider implements Iterable<Iterable<String>> {
-	File file
+	File dataFile
 
-	CSVDataProvider(String path) {
-		file = new File(path)
+	CSVDataProvider(File file) {
+		dataFile = file
 	}
 
 	@Override
 	Iterator<Iterable<String>> iterator() {
 		List<List<String>> list = new ArrayList<List<String>>()
 
-		def lines = file.readLines()
+		def lines = dataFile.readLines()
 
 		for (line in lines) {
 			def cellArray = line.split(",")

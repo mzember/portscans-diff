@@ -1,34 +1,20 @@
 package security
 
 import plugins.exec
-import java.io.ByteArrayOutputStream
+import java.io.OutputStream
 
-fun loginWithCredentials(protocol: String, host: String, login: String, password: String): String {
+fun loginWithCredentials(protocol: String, host: String, login: String, password: String, errorOutput: OutputStream, standardOutput: OutputStream): Int {
 	val path = "c/portal/login"
 
 	val parameters = "login=$login&password=$password"
 
 	val url = "$protocol://$host/$path?$parameters"
 
-	val outputStream = ByteArrayOutputStream()
-
-	val exitValue = exec(
+	return exec(
 		executable = "curl",
-		args = listOf("-v", "-s", "-H", "'Cookie: COOKIE_SUPPORT=true'", "--max-time", "3", "--url", url),
-		errorOutput = outputStream,
-		standardOutput = outputStream,
+		args = listOf("-v", "-s", "-L", "-H", "'Cookie: COOKIE_SUPPORT=true'", "--max-time", "3", "--url", url),
+		errorOutput = errorOutput,
+		standardOutput = standardOutput,
 		skipPrintCommandLine = false
 	)
-
-	val outputString = outputStream.toString()
-
-	if (exitValue != 0) {
-		println("[!] Exit value $exitValue")
-
-		println(outputString)
-
-		throw Exception("Exited with value: $exitValue")
-	}
-
-	return outputString
 }
