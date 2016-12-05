@@ -1,8 +1,4 @@
-import org.junit.internal.AssumptionViolatedException
-import plugins.ExecKt
 import security.LoginKt
-import spock.lang.IgnoreIf
-import spock.lang.Requires
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

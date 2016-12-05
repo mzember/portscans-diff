@@ -1,5 +1,0 @@
-# Readme
-
-## How to
-
-* ./gradlew

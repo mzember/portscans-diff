@@ -1,1 +1,5 @@
-# liferay-information-services-security
+# Readme
+
+## How to
+
+* ./gradlew
