@@ -1,17 +1,16 @@
 package security
 
 import plugins.exec
-import java.io.OutputStream
+import java.io.ByteArrayOutputStream
 
-fun getUser(user: String, username: String, password: String, errorOutput: OutputStream, standardOutput: OutputStream): Int {
-	var credentials = "$username:$password"
-	val url = "https://loop-uat.liferay.com/web/guest/home/-/loop/people/_$user/view.json"
+fun getUser(screenname: String, errorStream: ByteArrayOutputStream, outputStream: ByteArrayOutputStream): Int {
+	val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjI4MTc0LCJkZXZpY2UiOiJscmlzLXNlY3VyaXR5IiwicmV2b2thYmxlIjp0cnVlLCJpYXQiOjE0ODEwNjkwMjJ9.ZO0i5rXhhBjuZi4Q7-N3UehusIEwx_asfJVsc8Sni38"
 
 	return exec(
 		executable = "curl",
-		args = listOf("--max-time", "3", "-s", "-u", credentials, "--url", url),
-		errorOutput = errorOutput,
-		standardOutput = standardOutput,
+		args = listOf("-H", "Authorization: Bearer $token", "https://loop.liferay.com/web/guest/home/-/loop/people/_${screenname}/view.json"),
+		standardOutput = outputStream,
+		errorOutput = errorStream,
 		skipPrintCommandLine = false
 	)
 }
