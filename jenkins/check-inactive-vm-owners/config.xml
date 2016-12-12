@@ -32,7 +32,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./gradlew test --tests *LoginSpec*do\ not\ allow\ log\ in\ to\ host*</command>
+      <command>./gradlew test --tests *UtilSpec*do\ not\ allow\ vm\ owner*</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
