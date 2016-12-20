@@ -1,5 +1,5 @@
 import groovy.json.JsonSlurper
-import security.UtilKt
+import security.test.UtilKt
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

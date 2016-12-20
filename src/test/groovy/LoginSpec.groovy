@@ -1,4 +1,4 @@
-import security.LoginKt
+import security.test.LoginKt
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll

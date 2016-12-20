@@ -27,6 +27,7 @@ apply {
 	plugin("idea")
 	plugin("groovy")
 	plugin("kotlin")
+	plugin("application")
 }
 
 dependencies {
@@ -50,6 +51,11 @@ idea {
 		downloadJavadoc = true
 		downloadSources = true
 	}
+}
+
+task generateResourceSites (dependsOn: 'classes', type: JavaExec) {
+	main = 'security.util.GenerateResourceSitesKt'
+	classpath = sourceSets.main.runtimeClasspath
 }
 
 defaultTasks("test")
