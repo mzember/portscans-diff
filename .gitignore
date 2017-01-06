@@ -1,6 +1,8 @@
+*-ext.properties
 *.iml
+*.ipr
 */kotlin-reflect.jar
-*/kotlin-runtime-sources.jar 
+*/kotlin-runtime-sources.jar
 */kotlin-runtime.jar
 .gradle/
 .idea/
