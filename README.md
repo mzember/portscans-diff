@@ -4,8 +4,8 @@
 
 ### Local Testing
 
-* ./gradlew test --tests \*LoginSpec\*do\ not\ allow\ log\ in\ to\ host\*
-* ./gradlew test --tests \*UtilSpec\*do\ not\ allow\ vm\ owner\*
+* ./gradlew test --tests *"do not allow log in to host"
+* ./gradlew test --tests *"do not allow vm owner"
 
 ### Generate src/main/resources/sites file
 
