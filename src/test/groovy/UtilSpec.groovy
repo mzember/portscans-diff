@@ -1,13 +1,18 @@
 import groovy.json.JsonSlurper
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
+import plugins.ExecKt
 import security.test.UtilKt
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class UtilSpec extends Specification {
+	@Rule
+	TemporaryFolder temporaryFolder = new TemporaryFolder()
 
 	@Shared
-	File dataFile = File.createTempFile("data", ".csv");
+	File dataFile = File.createTempFile("data", ".csv")
 
 	def setupSpec() {
 		def screennames = []
@@ -50,6 +55,31 @@ class UtilSpec extends Specification {
 
 		where:
 		[screenname] << new CSVDataProvider(dataFile)
+	}
+
+	def "liferay.com ssllabs score should be A- or above"() {
+		setup:
+		def hostfile = new File("src/main/resources/sites")
+
+		when:
+		def byteArrayOutputStream = new ByteArrayOutputStream()
+
+		ExecKt.exec("./ssllabs-scan", ["--quiet", "--hostfile", hostfile.absolutePath], [:], byteArrayOutputStream, byteArrayOutputStream, new File("tools"), false)
+
+		def jsonSlurper = new JsonSlurper()
+
+		def outputString = byteArrayOutputStream.toString()
+
+		def outputJSONObject = jsonSlurper.parseText(outputString)
+
+		println "outputJSONObject = $outputJSONObject"
+
+		def liferayDotComGrades = outputJSONObject.endpoints[0].grade
+
+		then:
+		for (liferayDotComGrade in liferayDotComGrades) {
+			assert (liferayDotComGrade == "A-") || (liferayDotComGrade == "A") || (liferayDotComGrade == "A+")
+		}
 	}
 
 }
