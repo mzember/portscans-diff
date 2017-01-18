@@ -32,7 +32,7 @@
 	<concurrentBuild>false</concurrentBuild>
 	<builders>
 		<hudson.tasks.Shell>
-			<command>./gradlew --rerun-tasks test --tests *"liferay.com ssllabs score should be A- or above"</command>
+			<command>./gradlew --rerun-tasks test --tests *"ssllabs score for #domainName should be A- or above"</command>
 		</hudson.tasks.Shell>
 	</builders>
 	<publishers>
