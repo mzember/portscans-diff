@@ -12,7 +12,10 @@ class UtilSpec extends Specification {
 	TemporaryFolder temporaryFolder = new TemporaryFolder()
 
 	@Shared
-	File dataFile = File.createTempFile("data", ".csv")
+	File screennamesFile = File.createTempFile("screennames", ".csv")
+
+	@Shared
+	File domainNameFile = File.createTempFile("domains", ".csv")
 
 	def setupSpec() {
 		def screennames = []
@@ -30,9 +33,13 @@ class UtilSpec extends Specification {
 
 			screennames.add(screenname)
 
-			dataFile.append(screenname)
-			dataFile.append("\n")
+			screennamesFile.append(screenname)
+			screennamesFile.append("\n")
 		}
+
+		def sitesFile = new File("src/main/resources/sites")
+
+		domainNameFile.text = sitesFile.text
 	}
 
 	@Unroll
@@ -54,17 +61,15 @@ class UtilSpec extends Specification {
 		}
 
 		where:
-		[screenname] << new CSVDataProvider(dataFile)
+		[screenname] << new CSVDataProvider(screennamesFile)
 	}
 
-	def "liferay.com ssllabs score should be A- or above"() {
-		setup:
-		def hostfile = new File("src/main/resources/sites")
-
+	@Unroll
+	def "ssllabs score for #domainName should be A- or above"() {
 		when:
 		def byteArrayOutputStream = new ByteArrayOutputStream()
 
-		ExecKt.exec("./ssllabs-scan", ["--quiet", "--hostfile", hostfile.absolutePath], [:], byteArrayOutputStream, byteArrayOutputStream, new File("tools"), false)
+		ExecKt.exec("./ssllabs-scan", ["--quiet", hostname], [:], byteArrayOutputStream, byteArrayOutputStream, new File("tools"), false)
 
 		def jsonSlurper = new JsonSlurper()
 
@@ -72,14 +77,15 @@ class UtilSpec extends Specification {
 
 		def outputJSONObject = jsonSlurper.parseText(outputString)
 
-		println "outputJSONObject = $outputJSONObject"
-
 		def liferayDotComGrades = outputJSONObject.endpoints[0].grade
 
 		then:
 		for (liferayDotComGrade in liferayDotComGrades) {
 			assert (liferayDotComGrade == "A-") || (liferayDotComGrade == "A") || (liferayDotComGrade == "A+")
 		}
+
+		where:
+		[domainName] << new CSVDataProvider(domainNameFile)
 	}
 
 }
