@@ -69,7 +69,7 @@ class UtilSpec extends Specification {
 		when:
 		def byteArrayOutputStream = new ByteArrayOutputStream()
 
-		ExecKt.exec("./ssllabs-scan", ["--quiet", hostname], [:], byteArrayOutputStream, byteArrayOutputStream, new File("tools"), false)
+		ExecKt.exec("./ssllabs-scan", ["--quiet", domainName], [:], byteArrayOutputStream, byteArrayOutputStream, new File("tools"), false)
 
 		def jsonSlurper = new JsonSlurper()
 
