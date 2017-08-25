@@ -1,0 +1,1 @@
+Add penscan-ext.properties with jiraUsername, jiraPassword, and jiraHost (if you want to change from UAT) then ```./gradlew run```
