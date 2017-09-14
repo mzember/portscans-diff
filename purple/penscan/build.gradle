@@ -22,6 +22,10 @@ run {
 	systemProperties = ['java.util.logging.SimpleFormatter.format': '%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4\$-6s %2$s %5$s%6$s%n']
 }
 
+compileKotlin {
+	kotlinOptions.freeCompilerArgs = ['-Xskip-runtime-version-check']
+}
+
 repositories {
 	mavenCentral()
 }
@@ -29,7 +33,6 @@ repositories {
 dependencies {
 	compile "org.json:json:20170516"
 	compile "pl.allegro.finance:tradukisto:1.0.0"
-	compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 	compile "org.jetbrains.kotlin:kotlin-script-util:$kotlin_version"
 	testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
 }

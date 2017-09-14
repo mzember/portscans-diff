@@ -96,42 +96,42 @@ class MainSpec extends Specification {
 		issue ==~ /^[A-Z]+-[0-9]+/
 	}
 
-//	def "getOwners"() {
+//	def "setOwnersData"() {
 //		setup:
 //		def penscan = new Penscan()
 //
 //		when:
 //		def data = new ArrayList<Map<String, Object>>()
 //
-//		penscan.getTargets(data)
-//		penscan.getOwners(data)
+//		penscan.penscanTargets(data)
+//		penscan.setOwnersData(data)
 //
 //		then:
 //		data == [[:]]
 //	}
 
-//	def "getOwners"() {
+//	def "setOwnersData"() {
 //		setup:
 //		def penscan = new Penscan()
 //
 //		when:
 //		def data = new ArrayList<Map<String, Object>>()
 //
-//		penscan.getTargets(data)
-//		penscan.getOwners(data)
+//		penscan.penscanTargets(data)
+//		penscan.setOwnersData(data)
 //
 //		then:
 //		data == [[:]]
 //	}
 
-//	def "getOwners"() {
+//	def "setOwnersData"() {
 //		setup:
 //		def penscan = new Penscan()
 //
 //		when:
 //		def data = new ArrayList<Map<String, Object>>()
 //
-//		penscan.getOwners(data)
+//		penscan.setOwnersData(data)
 //
 //		then:
 //		data == [[:]]
