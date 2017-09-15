@@ -4,15 +4,15 @@ package com.liferay.security
 
 import org.json.JSONArray
 import org.json.JSONObject
+import pl.allegro.finance.tradukisto.ValueConverters
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-import java.util.logging.Logger
 import java.util.Properties
+import java.util.logging.Logger
 import javax.script.ScriptEngineManager
-import pl.allegro.finance.tradukisto.ValueConverters
 
 fun main(args: Array<String>) {
 	val properties = Properties()
@@ -40,43 +40,45 @@ private fun loadExtProperties(properties: Properties, propertiesFile: File) {
 	}
 }
 
-class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<MutableMap<String, Any>>(), properties: Properties = Properties()) {
+class Penscan(properties: Properties = Properties()) {
 	companion object {
 		val logger = Logger.getLogger(Penscan::javaClass.name)!!
 	}
 
-	val data = mutableListOf<MutableMap<String, Any>>()
 	val properties = Properties()
 
 	init {
-		logger.info("")
+		logger.fine("")
 
-		(this.data).addAll(data)
 		(this.properties).putAll(properties)
 	}
 
 	fun penscan() {
-		aquireTargets()
-		associateOwnersWithTargets()
-		attemptVulnerabilityDetections()
-		associateKnownVulnerabilitiesWithTargets()
-		createJiraTicketsForNewVulnerabilities()
+		logger.fine("")
+
+		val data = mutableListOf<MutableMap<String, Any>>()
+
+		aquireTargets(data)
+		associateOwnersWithTargets(data)
+		attemptVulnerabilityDetections(data)
+
+		val knownVulnerabilitiesJSONObject = getKnownVulnerabilitiesJSONObject()
+
+		associateKnownVulnerabilitiesWithTargets(knownVulnerabilitiesJSONObject, data)
+
+		createJiraTicketsForNewVulnerabilities(data)
 	}
 
-	private fun attemptVulnerabilityDetections(data: MutableList<MutableMap<String, Any>> = this.data) {
+	private fun attemptVulnerabilityDetections(data: MutableList<MutableMap<String, Any>>) {
+		logger.info("")
+
 		val liferayVulnerabilityDetectionFiles = getResourceNameFiles("vulnerabilities/liferay")
 
 		checkAndSetVulnerabilitiesData(data, liferayVulnerabilityDetectionFiles)
 	}
 
-	private fun associateKnownVulnerabilitiesWithTargets(data: MutableList<MutableMap<String, Any>> = this.data) {
+	private fun associateKnownVulnerabilitiesWithTargets(knownVulnerabilitiesJSONObject: JSONObject, data: MutableList<MutableMap<String, Any>>) {
 		logger.info("")
-
-		val jiraHost: String by properties
-		val jiraPassword: String by properties
-		val jiraUsername: String by properties
-
-		val knownVulnerabilitiesJSONObject = getKnownVulnerabilitiesJSONObject(jiraHost, jiraPassword, jiraUsername)
 
 		val selectOwners = dataKeySelectValues(data, "owner")
 
@@ -88,7 +90,7 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 			for (ownerDatum in ownerData) {
 				val name = ownerDatum["name"] as String
 
-				val knownVulnerabilities = getKnownVulnerabilities(name, knownVulnerabilitiesJSONObject)
+				val knownVulnerabilities = getKnownVulnerabilities(knownVulnerabilitiesJSONObject, name)
 
 				val vulnerabilitiesData = (ownerDatum["vulnerabilities"] as MutableList<*>)
 
@@ -120,13 +122,17 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		}
 	}
 
-	private fun associateOwnersWithTargets(data: MutableList<MutableMap<String, Any>> = this.data) {
+	private fun associateOwnersWithTargets(data: MutableList<MutableMap<String, Any>>) {
+		logger.info("")
+
 		val nameOwnerMaps = getKtsResourceData("nameOwnerMaps.kts")
 
 		setOwnersData(data, nameOwnerMaps)
 	}
 
-	private fun aquireTargets(data: MutableList<MutableMap<String, Any>> = this.data) {
+	private fun aquireTargets(data: MutableList<MutableMap<String, Any>>) {
+		logger.info("")
+
 		val nmapIpNameStatusMaps = getNmapIpNameStatusMaps()
 
 		normalizeNmapIpNameStatusMaps(nmapIpNameStatusMaps)
@@ -135,11 +141,13 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 
 		val ipNameStatusMapsExt = getKtsResourceData("ipNameStatusMaps-ext.kts")
 
+		normalizeNmapIpNameStatusMaps(ipNameStatusMapsExt)
+
 		data.addAll(ipNameStatusMapsExt)
 	}
 
-	private fun checkAndSetVulnerabilitiesData(data: MutableList<MutableMap<String, Any>> = this.data, liferayVulnerabilityDetectionFiles: List<File>) {
-		logger.info("")
+	private fun checkAndSetVulnerabilitiesData(data: MutableList<MutableMap<String, Any>>, liferayVulnerabilityDetectionFiles: List<File>) {
+		logger.fine("")
 
 		for (datum in data) {
 			val vulnerabilities = mutableListOf<MutableMap<String, String>>()
@@ -176,6 +184,8 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun checkVulnerability(host: String, vulnerabilityDetectionFilePath: String): Boolean {
+		logger.finest("")
+
 		val exitValue = exec("sh", listOf(vulnerabilityDetectionFilePath, host), exceptionOnExitValue = false, skipPrintCommandLine = true)
 
 		@Suppress("RedundantIf")
@@ -187,7 +197,7 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		}
 	}
 
-	private fun createJiraTicketsForNewVulnerabilities(data: MutableList<MutableMap<String, Any>> = this.data) {
+	private fun createJiraTicketsForNewVulnerabilities(data: MutableList<MutableMap<String, Any>>) {
 		logger.info("")
 
 		val jiraHost: String by properties
@@ -292,7 +302,7 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun createIssue(assignee: String, description: String, scriptLabels: List<String>, summary: String): String {
-		logger.info("")
+		logger.fine("")
 
 		val jiraPassword: String by properties
 		val jiraUsername: String by properties
@@ -328,6 +338,8 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun buildDescription(hosts: MutableSet<String>, newHostVulnerabilities: MutableMap<String, MutableList<String>>, scanDate: Date, vulnerabilityTickets: MutableSet<String>): String {
+		logger.finer("")
+
 		val jiraTicketDescriptionPrefix: String by properties
 
 		var description = jiraTicketDescriptionPrefix + "||host||"
@@ -372,10 +384,13 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		val recycleCandidateDate = SimpleDateFormat("EEEE, MMMM dd, yyyy").format(twoWeeksTime)
 
 		description += "If you don't respond to us on this ticket within two weeks (by $recycleCandidateDate), the above VM resources will be deactivated until the issue can be resolved.\\n"
+
 		return description
 	}
 
 	private fun buildSummary(assignee: String, hosts: MutableSet<String>, vulnerabilityTickets: MutableSet<String>): String {
+		logger.finer("")
+
 		val vulnerabilitySize = vulnerabilityTickets.size
 
 		var vulnerabilityWords = "vulnerability was"
@@ -410,6 +425,8 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun getIpNameStatusMaps(pingScanOutputFile: File): MutableList<MutableMap<String, Any>> {
+		logger.fine("")
+
 		val ipNameStatusMaps = mutableListOf<MutableMap<String, Any>>()
 
 		val pingScanGreppableOutputLineRegex = Regex("^Host: (.*) \\((.*)\\)\\tStatus: (.*)$")
@@ -436,7 +453,9 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		return ipNameStatusMaps
 	}
 
-	private fun getKnownVulnerabilities(name: String, responseJSONObject: JSONObject): MutableList<String> {
+	private fun getKnownVulnerabilities(responseJSONObject: JSONObject, name: String): MutableList<String> {
+		logger.fine("")
+
 		val jiraTicketScriptLabelsCustomFieldId: String by properties
 
 		val vulnerabilities = mutableListOf<String>()
@@ -475,12 +494,18 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		return vulnerabilities
 	}
 
-	private fun getKnownVulnerabilitiesJSONObject(host: String, password: String, user: String): JSONObject {
-		val url = """https://$host/rest/api/2/search?jql=cf\[19627\]%20in%20("scan:owner-host-vulnerabilities","type:generated")%20and%20status%20not%20in%20(closed)"""
+	private fun getKnownVulnerabilitiesJSONObject(): JSONObject {
+		logger.info("")
+
+		val jiraHost: String by properties
+		val jiraPassword: String by properties
+		val jiraUsername: String by properties
+
+		val url = """https://$jiraHost/rest/api/2/search?jql=cf\[19627\]%20in%20("scan:owner-host-vulnerabilities","type:generated")%20and%20status%20not%20in%20(closed)"""
 
 		val byteArrayOutputStream = ByteArrayOutputStream()
 
-		exec("curl", listOf("--silent", "--user", "$user:$password", "--header", "Content-Type: application/json", url), standardOutput = byteArrayOutputStream, skipPrintCommandLine = true)
+		exec("curl", listOf("--silent", "--user", "$jiraUsername:$jiraPassword", "--header", "Content-Type: application/json", url), standardOutput = byteArrayOutputStream, skipPrintCommandLine = true)
 
 		val byteArrayOutputString = byteArrayOutputStream.toString()
 
@@ -488,6 +513,8 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun getKtsResourceData(name: String): MutableList<MutableMap<String, Any>> {
+		logger.finest("")
+
 		val scriptEngineManager = ScriptEngineManager()
 
 		val ktsEngine = scriptEngineManager.getEngineByExtension("kts")
@@ -505,7 +532,7 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun getNmapIpNameStatusMaps(): MutableList<MutableMap<String, Any>> {
-		logger.info("")
+		logger.finer("")
 
 		val pingScanOutputFile = File("pingScanOutput.gnmap")
 
@@ -519,6 +546,8 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun getResourceNameFiles(name: String): MutableList<File> {
+		logger.finer("")
+
 		val classLoader = javaClass.classLoader
 
 		val liferayVulnerabilitiesURL = classLoader.getResource(name)!!
@@ -530,7 +559,9 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		return liferayVulnerabilityFiles.toMutableList()
 	}
 
-	private fun dataKeySelectValues(data: MutableList<MutableMap<String, Any>> = this.data, keyName: String): MutableList<Any> {
+	private fun dataKeySelectValues(data: MutableList<MutableMap<String, Any>>, keyName: String): MutableList<Any> {
+		logger.finest("")
+
 		val list = mutableListOf<Any>()
 
 		loop@
@@ -545,7 +576,9 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		return list
 	}
 
-	private fun dataKeyValueFetchData(data: MutableList<MutableMap<String, Any>> = this.data, keyName: String, keyValue: Any): MutableList<MutableMap<String, Any>> {
+	private fun dataKeyValueFetchData(data: MutableList<MutableMap<String, Any>>, keyName: String, keyValue: Any): MutableList<MutableMap<String, Any>> {
+		logger.finest("")
+
 		val list = mutableListOf<MutableMap<String, Any>>()
 
 		loop@
@@ -560,7 +593,9 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		return list
 	}
 
-	private fun dataKeyValuePutAll(data: MutableList<MutableMap<String, Any>> = this.data, keyName: String, keyValue: String, valueMap: Map<String, String>) {
+	private fun dataKeyValuePutAll(data: MutableList<MutableMap<String, Any>>, keyName: String, keyValue: String, valueMap: Map<String, String>) {
+		logger.finest("")
+
 		loop@
 		for (datum in data) {
 			for ((key, value) in datum) {
@@ -574,13 +609,17 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun normalizeNmapIpNameStatusMaps(nmapIpNameStatusMaps: MutableList<MutableMap<String, Any>>) {
+		logger.finer("")
+
 		for (nmapIpNameStatusMap in nmapIpNameStatusMaps) {
-			normalizeNmapIpNameStatusMapsName(nmapIpNameStatusMap)
+			normalizeNmapIpNameStatusMapName(nmapIpNameStatusMap)
 			normalizeNmapIpNameStatusMapStatus(nmapIpNameStatusMap)
 		}
 	}
 
-	private fun normalizeNmapIpNameStatusMapsName(nmapIpNameStatusMap: MutableMap<String, Any>) {
+	private fun normalizeNmapIpNameStatusMapName(nmapIpNameStatusMap: MutableMap<String, Any>) {
+		logger.finest("")
+
 		var name = nmapIpNameStatusMap["name"] as String
 
 		val normalizedNameValueRegex = Regex("^(.*)\\.lax\\.liferay\\.com")
@@ -597,6 +636,8 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 	}
 
 	private fun normalizeNmapIpNameStatusMapStatus(nmapIpNameStatusMap: MutableMap<String, Any>) {
+		logger.finest("")
+
 		var status = nmapIpNameStatusMap["status"] as String
 
 		status = status.decapitalize()
@@ -604,8 +645,8 @@ class Penscan(data: MutableList<MutableMap<String, Any>> = mutableListOf<Mutable
 		nmapIpNameStatusMap.put("status", status)
 	}
 
-	private fun setOwnersData(data: MutableList<MutableMap<String, Any>> = this.data, nameOwnerMaps: MutableList<MutableMap<String, Any>>) {
-		logger.info("")
+	private fun setOwnersData(data: MutableList<MutableMap<String, Any>>, nameOwnerMaps: MutableList<MutableMap<String, Any>>) {
+		logger.fine("")
 
 		for (nameOwnerMap in nameOwnerMaps) {
 			val nameOwner = nameOwnerMap

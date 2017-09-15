@@ -1,0 +1,38 @@
+{
+  "expand": "schema,names",
+  "startAt": 0,
+  "maxResults": 50,
+  "total": 2,
+  "issues": [
+    {
+      "key": "TICKET-1",
+      "fields": {
+        "description": "A recent security scan has identified one or more vulnerabilities on the systems ...\n",
+        "customfield_19627": [
+          "host-vulnerability:one;VULNERABILITY-1",
+          "host-vulnerability:one;VULNERABILITY-2",
+          "scanID:20170913192710",
+          "tool-version:3.0.0",
+          "tool:liferay-vulnerability-scanner",
+          "type:generated"
+        ],
+        "summary": "One vulnerability was found on one host owned by Some One"
+      }
+    },
+    {
+      "key": "TICKET-2",
+      "fields": {
+        "description": "A recent security scan has identified one or more vulnerabilities on the systems ...\n",
+        "customfield_19627": [
+          "host-vulnerability:two;VULNERABILITY-2",
+          "host-vulnerability:three;VULNERABILITY-3",
+          "scanID:20170913192710",
+          "tool-version:3.0.0",
+          "tool:liferay-vulnerability-scanner",
+          "type:generated"
+        ],
+        "summary": "One vulnerability was found on one host owned by Some One"
+      }
+    }
+  ]
+}
