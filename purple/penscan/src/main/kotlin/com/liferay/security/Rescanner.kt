@@ -6,15 +6,13 @@ import java.io.File
 import java.util.Properties
 import java.util.logging.Logger
 
-import org.json.JSONObject
-
 val LABEL_VULNERABLE_HOST_PREFIX = "host-vulnerability:"
 
 fun main(args: Array<String>) {
 	if (args.isEmpty()) {
 		println("You must specify a JIRA ticket. For example: \"-Pticket=LRIS-123\"")
 
-		return;
+		return
 	}
 
 	val properties = Properties()
@@ -27,7 +25,7 @@ fun main(args: Array<String>) {
 
 	val rescanner = Rescanner(properties = properties)
 
-	rescanner.rescan(args.get(0))
+	rescanner.rescan(args[0])
 }
 
 private fun loadExtProperties(properties: Properties, propertiesFile: File) {
@@ -48,7 +46,7 @@ class Rescanner(properties: Properties = Properties()) {
 	}
 
 	val jiraRestUtil = JiraRestUtil(properties = properties)
-	
+
 	fun rescan(issueKey: String) {
 		val jiraIssueJSONObject = jiraRestUtil.getIssue(issueKey)
 
@@ -69,5 +67,4 @@ class Rescanner(properties: Properties = Properties()) {
 			}
 		}
 	}
-
 }

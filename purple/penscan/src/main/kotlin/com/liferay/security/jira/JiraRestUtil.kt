@@ -42,5 +42,4 @@ class JiraRestUtil(properties: Properties = Properties()) {
 
 		return jsonObject
 	}
-
 }
