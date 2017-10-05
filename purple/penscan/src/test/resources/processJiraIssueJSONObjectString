@@ -1,0 +1,19 @@
+{
+	"key": "LRINFOSEC-172",
+	"fields": {
+		"summary": "testsummary",
+		"customfield_19627": [
+			"host-vulnerability:cloud-10-1-0-13;LSV-278",
+			"host-vulnerability:cloud-10-1-0-13;LSV-322",
+			"host-vulnerability:cloud-10-50-0-230;LSV-322",
+			"host:cloud-10-1-0-13",
+			"host:cloud-10-50-0-230",
+			"scanID:20170810150252",
+			"tool-version:liferay-vulnerability-scanner-0.0.1",
+			"tool:liferay-vulnerability-scanner",
+			"type:generated",
+			"vulnerability:LSV-278",
+			"vulnerability:LSV-322"
+		]
+	}
+}

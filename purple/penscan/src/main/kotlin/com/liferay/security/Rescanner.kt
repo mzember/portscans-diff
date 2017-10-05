@@ -46,6 +46,14 @@ class Rescanner(properties: Properties = Properties()) {
 		val logger = Logger.getLogger(Rescanner::javaClass.name)!!
 	}
 
+	val properties = Properties()
+
+	init {
+		logger.fine("")
+
+		(this.properties).putAll(properties)
+	}
+
 	val jiraRestUtil = JiraRestUtil(properties = properties)
 
 	fun rescan(issueKey: String) {
@@ -59,7 +67,9 @@ class Rescanner(properties: Properties = Properties()) {
 
 		val fieldsJSONObject = jiraIssueJSONObject.getJSONObject("fields")
 
-		val labelsJSONArray = fieldsJSONObject.getJSONArray("labels")
+		val jiraTicketScriptLabelsCustomFieldId: String by properties
+
+		val labelsJSONArray = fieldsJSONObject.getJSONArray("customfield_$jiraTicketScriptLabelsCustomFieldId")
 
 		for (labelJSONString in labelsJSONArray) {
 			val label = (labelJSONString as String)
