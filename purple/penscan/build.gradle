@@ -37,6 +37,16 @@ dependencies {
 	testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
 }
 
+task rescan(type: JavaExec) {
+	classpath = sourceSets.main.runtimeClasspath
+
+	main = 'com.liferay.security.RescannerKt'
+
+	if (project.hasProperty('ticket')) {
+		args(ticket)
+	}
+}
+
 task wrapper(type: Wrapper) {
 	gradleVersion = '4.0'
 }
