@@ -61,8 +61,8 @@ class Rescanner(properties: Properties = Properties()) {
 
 		val labelsJSONArray = fieldsJSONObject.getJSONArray("labels")
 
-		for (i in 0..labelsJSONArray!!.length() - 1) {
-			val label = labelsJSONArray.getString(i)
+		for (labelJSONString in labelsJSONArray) {
+			val label = (labelJSONString as String)
 
 			if (label.startsWith(LABEL_VULNERABLE_HOST_PREFIX)) {
 				val hostVulnerability = label.substring(LABEL_VULNERABLE_HOST_PREFIX.length)
