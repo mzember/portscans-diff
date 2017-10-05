@@ -1,6 +1,7 @@
 package com.liferay.security
 
 import com.liferay.security.jira.*
+import org.json.JSONObject
 
 import java.io.File
 import java.util.Properties
@@ -48,7 +49,13 @@ class Rescanner(properties: Properties = Properties()) {
 	val jiraRestUtil = JiraRestUtil(properties = properties)
 
 	fun rescan(issueKey: String) {
-		val jiraIssueJSONObject = jiraRestUtil.getIssue(issueKey)
+		val issueJSONObject = jiraRestUtil.getIssueJSONObject(issueKey)
+
+		val issueHostVulnerabilities = processJiraIssueJSONObject(issueJSONObject)
+	}
+
+	fun processJiraIssueJSONObject(jiraIssueJSONObject: JSONObject): MutableMap<String, MutableList<String>> {
+		val hostVulnerabilities = mutableMapOf<String, MutableList<String>>()
 
 		val fieldsJSONObject = jiraIssueJSONObject.getJSONObject("fields")
 
@@ -64,7 +71,18 @@ class Rescanner(properties: Properties = Properties()) {
 
 				val host = hostVulnerabilityArray[0]
 				val vulnerability = hostVulnerabilityArray[1]
+
+				if (hostVulnerabilities.containsKey(host)) {
+					val vulnerabilities = hostVulnerabilities[host]!!
+
+					vulnerabilities.add(vulnerability)
+				}
+				else {
+					hostVulnerabilities.put(host, mutableListOf(vulnerability))
+				}
 			}
 		}
+
+		return hostVulnerabilities
 	}
 }

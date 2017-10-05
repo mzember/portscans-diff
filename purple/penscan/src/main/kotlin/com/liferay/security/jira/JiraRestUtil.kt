@@ -19,7 +19,7 @@ class JiraRestUtil(properties: Properties = Properties()) {
 		(this.properties).putAll(properties)
 	}
 
-	fun getIssue(issueKey: String): JSONObject {
+	fun getIssueJSONObject(issueKey: String): JSONObject {
 		val jiraHost: String by properties
 		val jiraPassword: String by properties
 		val jiraUsername: String by properties
