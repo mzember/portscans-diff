@@ -2,6 +2,7 @@
 
 package com.liferay.security
 
+import com.liferay.security.util.*
 import org.json.JSONArray
 import org.json.JSONObject
 import pl.allegro.finance.tradukisto.ValueConverters
@@ -72,7 +73,7 @@ class Penscan(properties: Properties = Properties()) {
 	private fun attemptVulnerabilityDetections(data: MutableList<MutableMap<String, Any>>) {
 		logger.info("")
 
-		val liferayVulnerabilityDetectionFiles = getResourceNameFiles("vulnerabilities/liferay")
+		val liferayVulnerabilityDetectionFiles = getResourceFiles("vulnerabilities/liferay")
 
 		checkAndSetVulnerabilitiesData(data, liferayVulnerabilityDetectionFiles)
 	}
@@ -543,20 +544,6 @@ class Penscan(properties: Properties = Properties()) {
 		exec("nmap", listOf("-oG", pingScanOutputFile.path, "-iL", nmapTargetSpecificationFile.path, "-sn"), standardOutput = byteArrayOutputStream, skipPrintCommandLine = true)
 
 		return getIpNameStatusMaps(pingScanOutputFile)
-	}
-
-	private fun getResourceNameFiles(name: String): MutableList<File> {
-		logger.finer("")
-
-		val classLoader = javaClass.classLoader
-
-		val liferayVulnerabilitiesURL = classLoader.getResource(name)!!
-
-		val liferayVulnerabilitiesDir = File(liferayVulnerabilitiesURL.file)
-
-		val liferayVulnerabilityFiles = liferayVulnerabilitiesDir.listFiles()
-
-		return liferayVulnerabilityFiles.toMutableList()
 	}
 
 	private fun dataKeySelectValues(data: MutableList<MutableMap<String, Any>>, keyName: String): MutableList<Any> {
