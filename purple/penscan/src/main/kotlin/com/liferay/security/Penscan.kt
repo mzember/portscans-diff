@@ -3,9 +3,7 @@
 package com.liferay.security
 
 import com.liferay.security.util.*
-import org.json.JSONArray
-import org.json.JSONObject
-import pl.allegro.finance.tradukisto.ValueConverters
+
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
@@ -13,7 +11,13 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Properties
 import java.util.logging.Logger
+
 import javax.script.ScriptEngineManager
+
+import org.json.JSONArray
+import org.json.JSONObject
+
+import pl.allegro.finance.tradukisto.ValueConverters
 
 fun main(args: Array<String>) {
 	val properties = Properties()
