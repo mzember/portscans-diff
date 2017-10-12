@@ -29,6 +29,18 @@ fun main(args: Array<String>) {
 	penscan.penscan()
 }
 
+fun isVulnerable(host: String, vulnerabilityDetectionFilePath: String): Boolean {
+	val exitValue = exec("sh", listOf(vulnerabilityDetectionFilePath, host), exceptionOnExitValue = false, skipPrintCommandLine = true)
+
+	@Suppress("RedundantIf")
+	if (exitValue == 0) {
+		return true
+	}
+	else {
+		return false
+	}
+}
+
 private fun loadExtProperties(properties: Properties, propertiesFile: File) {
 	val propertiesFilePath = propertiesFile.path
 
@@ -73,7 +85,7 @@ class Penscan(properties: Properties = Properties()) {
 	private fun attemptVulnerabilityDetections(data: MutableList<MutableMap<String, Any>>) {
 		logger.info("")
 
-		val liferayVulnerabilityDetectionFiles = getResourceFiles("vulnerabilities/liferay")
+		val liferayVulnerabilityDetectionFiles = getResourceFiles(RESOURCE_LIFERAY_VULNERABILITIES_PATH)
 
 		checkAndSetVulnerabilitiesData(data, liferayVulnerabilityDetectionFiles)
 	}
@@ -170,7 +182,7 @@ class Penscan(properties: Properties = Properties()) {
 
 				val vulnerable: String
 
-				if (checkVulnerability(hostBestKeyValue, liferayVulnerabilityDetectionFile.path)) {
+				if (isVulnerable(hostBestKeyValue, liferayVulnerabilityDetectionFile.path)) {
 					vulnerable = "yes"
 				}
 				else {
@@ -181,20 +193,6 @@ class Penscan(properties: Properties = Properties()) {
 			}
 
 			datum.put("vulnerabilities", vulnerabilities)
-		}
-	}
-
-	private fun checkVulnerability(host: String, vulnerabilityDetectionFilePath: String): Boolean {
-		logger.finest("")
-
-		val exitValue = exec("sh", listOf(vulnerabilityDetectionFilePath, host), exceptionOnExitValue = false, skipPrintCommandLine = true)
-
-		@Suppress("RedundantIf")
-		if (exitValue == 0) {
-			return true
-		}
-		else {
-			return false
 		}
 	}
 

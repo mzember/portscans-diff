@@ -1,13 +1,13 @@
 package com.liferay.security
 
 import com.liferay.security.jira.*
-import org.json.JSONObject
+import com.liferay.security.util.*
 
 import java.io.File
 import java.util.Properties
 import java.util.logging.Logger
 
-val LABEL_VULNERABLE_HOST_PREFIX = "host-vulnerability:"
+import org.json.JSONObject
 
 fun main(args: Array<String>) {
 	if (args.isEmpty()) {
@@ -60,6 +60,8 @@ class Rescanner(properties: Properties = Properties()) {
 		val issueJSONObject = jiraRestUtil.getIssueJSONObject(issueKey)
 
 		val issueHostVulnerabilities = processJiraIssueJSONObject(issueJSONObject)
+
+		println(issueHostVulnerabilities)
 	}
 
 	fun processJiraIssueJSONObject(jiraIssueJSONObject: JSONObject): MutableMap<String, MutableList<String>> {
@@ -82,13 +84,22 @@ class Rescanner(properties: Properties = Properties()) {
 				val host = hostVulnerabilityArray[0]
 				val vulnerability = hostVulnerabilityArray[1]
 
-				if (hostVulnerabilities.containsKey(host)) {
-					val vulnerabilities = hostVulnerabilities[host]!!
+				try {
+					val vulnerabilityDetectionFile = getResourceFile(RESOURCE_LIFERAY_VULNERABILITIES_PATH, vulnerability)
 
-					vulnerabilities.add(vulnerability)
+					if (isVulnerable(host, vulnerabilityDetectionFile.path)) {
+						if (hostVulnerabilities.containsKey(host)) {
+							val vulnerabilities = hostVulnerabilities[host]!!
+
+							vulnerabilities.add(vulnerability)
+						}
+						else {
+							hostVulnerabilities.put(host, mutableListOf(vulnerability))
+						}
+					}
 				}
-				else {
-					hostVulnerabilities.put(host, mutableListOf(vulnerability))
+				catch (e: Exception) {
+					logger.severe(e.message)
 				}
 			}
 		}
