@@ -2,8 +2,7 @@
 
 package com.liferay.security
 
-import com.liferay.security.util.*
-
+import getProperties
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
@@ -19,41 +18,15 @@ import org.json.JSONObject
 
 import pl.allegro.finance.tradukisto.ValueConverters
 
+import getResourceDir
+import isVulnerable
+
 fun main(args: Array<String>) {
-	val properties = Properties()
-
-	val propertiesFile = File("penscan.properties")
-
-	properties.load(propertiesFile.inputStream())
-
-	loadExtProperties(properties, propertiesFile)
+	val properties = getProperties("penscan.properties")
 
 	val penscan = Penscan(properties = properties)
 
 	penscan.penscan()
-}
-
-fun isVulnerable(host: String, vulnerabilityDetectionFilePath: String): Boolean {
-	val exitValue = exec("sh", listOf(vulnerabilityDetectionFilePath, host), exceptionOnExitValue = false, skipPrintCommandLine = true)
-
-	if (exitValue == 0) {
-		return true
-	}
-	else {
-		return false
-	}
-}
-
-private fun loadExtProperties(properties: Properties, propertiesFile: File) {
-	val propertiesFilePath = propertiesFile.path
-
-	val propertiesExtFilePath = propertiesFilePath.replace(Regex("\\.properties$"), "-ext.properties")
-
-	val propertiesExtFile = File(propertiesExtFilePath)
-
-	if (propertiesExtFile.exists()) {
-		properties.load(propertiesExtFile.inputStream())
-	}
 }
 
 class Penscan(properties: Properties = Properties()) {

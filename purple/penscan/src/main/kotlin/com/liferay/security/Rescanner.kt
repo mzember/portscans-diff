@@ -1,44 +1,27 @@
 package com.liferay.security
 
-import com.liferay.security.jira.*
-import com.liferay.security.util.*
-
-import java.io.File
 import java.util.Properties
 import java.util.logging.Logger
 
 import org.json.JSONObject
 
+import getIssueJSONObject
+import getProperties
+import getResourceFile
+import isVulnerable
+
 fun main(args: Array<String>) {
 	if (args.isEmpty()) {
-		println("You must specify a JIRA ticket. For example: \"-Pticket=LRIS-123\"")
+		println("You must specify a JIRA ticket. For example: \"-Pticket=LRINFOSEC-123\"")
 
 		return
 	}
 
-	val properties = Properties()
+	val properties = getProperties("penscan.properties")
 
-	val propertiesFile = File("penscan.properties")
-
-	properties.load(propertiesFile.inputStream())
-
-	loadExtProperties(properties, propertiesFile)
-
-	val rescanner = Rescanner(properties = properties)
+	val rescanner = Rescanner(properties)
 
 	rescanner.rescan(args[0])
-}
-
-private fun loadExtProperties(properties: Properties, propertiesFile: File) {
-	val propertiesFilePath = propertiesFile.path
-
-	val propertiesExtFilePath = propertiesFilePath.replace(Regex("\\.properties$"), "-ext.properties")
-
-	val propertiesExtFile = File(propertiesExtFilePath)
-
-	if (propertiesExtFile.exists()) {
-		properties.load(propertiesExtFile.inputStream())
-	}
 }
 
 class Rescanner(properties: Properties = Properties()) {
@@ -54,19 +37,25 @@ class Rescanner(properties: Properties = Properties()) {
 		(this.properties).putAll(properties)
 	}
 
-	private val jiraRestUtil = JiraRestUtil(properties = properties)
-
 	fun rescan(issueKey: String) {
-		val issueJSONObject = jiraRestUtil.getIssueJSONObject(issueKey)
+		logger.info("")
 
-		val issueHostVulnerabilities = processJiraIssue(issueJSONObject)
+		val jiraHost: String by properties
+		val jiraPassword: String by properties
+		val jiraUsername: String by properties
+
+		val issueJSONObject = getIssueJSONObject(issueKey, jiraHost, jiraPassword, jiraUsername)
+
+		val issueHostVulnerabilities = getIssueHostVulnerabilities(issueJSONObject)
 
 		val issueHostVulnerabilitiesJSONObject = JSONObject(issueHostVulnerabilities)
 
 		println(issueHostVulnerabilitiesJSONObject.toString(4))
 	}
 
-	fun processJiraIssue(jiraIssueJSONObject: JSONObject): MutableMap<String, MutableList<String>> {
+	private fun getIssueHostVulnerabilities(jiraIssueJSONObject: JSONObject): MutableMap<String, MutableList<String>> {
+		logger.fine("")
+
 		val hostVulnerabilities = mutableMapOf<String, MutableList<String>>()
 
 		val fieldsJSONObject = jiraIssueJSONObject.getJSONObject("fields")
@@ -86,7 +75,7 @@ class Rescanner(properties: Properties = Properties()) {
 				val host = hostVulnerabilityArray[0]
 				val vulnerability = hostVulnerabilityArray[1]
 
-				val vulnerabilityDetectionFile = getResourceFile(RESOURCE_LIFERAY_VULNERABILITIES_PATH, vulnerability)
+				val vulnerabilityDetectionFile = getResourceFile(vulnerability, RESOURCE_LIFERAY_VULNERABILITIES_PATH)
 
 				if (isVulnerable(host, vulnerabilityDetectionFile.path)) {
 					if (hostVulnerabilities.containsKey(host)) {

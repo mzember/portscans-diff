@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class RescannerSpec extends Specification {
 
-	def "processJiraIssueJSONObject"() {
+	def "getIssueHostVulnerabilities"() {
 		setup:
 		Properties properties = new Properties()
 
@@ -18,7 +18,7 @@ class RescannerSpec extends Specification {
 
 		def issueJSONObject = new JSONObject(issueJSONObjectStringFile.text)
 
-		def hostsVulnerabilities = rescanner.processJiraIssue(issueJSONObject)
+		def hostsVulnerabilities = rescanner.getIssueHostVulnerabilities(issueJSONObject)
 
 		then:
 		hostsVulnerabilities == [

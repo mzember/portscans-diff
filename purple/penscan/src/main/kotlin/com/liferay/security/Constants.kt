@@ -1,4 +1,4 @@
-package com.liferay.security.util
+package com.liferay.security
 
 const val LABEL_VULNERABLE_HOST_PREFIX = "host-vulnerability:"
 
