@@ -1,4 +1,4 @@
-@file:Suppress("FoldInitializerAndIfToElvis", "LoopToCallChain")
+@file:Suppress("FoldInitializerAndIfToElvis", "LoopToCallChain", "RedundantIf")
 
 package com.liferay.security
 
@@ -36,7 +36,6 @@ fun main(args: Array<String>) {
 fun isVulnerable(host: String, vulnerabilityDetectionFilePath: String): Boolean {
 	val exitValue = exec("sh", listOf(vulnerabilityDetectionFilePath, host), exceptionOnExitValue = false, skipPrintCommandLine = true)
 
-	@Suppress("RedundantIf")
 	if (exitValue == 0) {
 		return true
 	}

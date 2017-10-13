@@ -18,7 +18,7 @@ class RescannerSpec extends Specification {
 
 		def issueJSONObject = new JSONObject(issueJSONObjectStringFile.text)
 
-		def hostsVulnerabilities = rescanner.processJiraIssueJSONObject(issueJSONObject)
+		def hostsVulnerabilities = rescanner.processJiraIssue(issueJSONObject)
 
 		then:
 		hostsVulnerabilities == [

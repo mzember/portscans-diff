@@ -59,12 +59,14 @@ class Rescanner(properties: Properties = Properties()) {
 	fun rescan(issueKey: String) {
 		val issueJSONObject = jiraRestUtil.getIssueJSONObject(issueKey)
 
-		val issueHostVulnerabilities = processJiraIssueJSONObject(issueJSONObject)
+		val issueHostVulnerabilities = processJiraIssue(issueJSONObject)
 
-		println(issueHostVulnerabilities)
+		val issueHostVulnerabilitiesJSONObject = JSONObject(issueHostVulnerabilities)
+
+		println(issueHostVulnerabilitiesJSONObject.toString(4))
 	}
 
-	fun processJiraIssueJSONObject(jiraIssueJSONObject: JSONObject): MutableMap<String, MutableList<String>> {
+	fun processJiraIssue(jiraIssueJSONObject: JSONObject): MutableMap<String, MutableList<String>> {
 		val hostVulnerabilities = mutableMapOf<String, MutableList<String>>()
 
 		val fieldsJSONObject = jiraIssueJSONObject.getJSONObject("fields")
@@ -84,22 +86,17 @@ class Rescanner(properties: Properties = Properties()) {
 				val host = hostVulnerabilityArray[0]
 				val vulnerability = hostVulnerabilityArray[1]
 
-				try {
-					val vulnerabilityDetectionFile = getResourceFile(RESOURCE_LIFERAY_VULNERABILITIES_PATH, vulnerability)
+				val vulnerabilityDetectionFile = getResourceFile(RESOURCE_LIFERAY_VULNERABILITIES_PATH, vulnerability)
 
-					if (isVulnerable(host, vulnerabilityDetectionFile.path)) {
-						if (hostVulnerabilities.containsKey(host)) {
-							val vulnerabilities = hostVulnerabilities[host]!!
+				if (isVulnerable(host, vulnerabilityDetectionFile.path)) {
+					if (hostVulnerabilities.containsKey(host)) {
+						val vulnerabilities = hostVulnerabilities[host]!!
 
-							vulnerabilities.add(vulnerability)
-						}
-						else {
-							hostVulnerabilities.put(host, mutableListOf(vulnerability))
-						}
+						vulnerabilities.add(vulnerability)
 					}
-				}
-				catch (e: Exception) {
-					logger.severe(e.message)
+					else {
+						hostVulnerabilities.put(host, mutableListOf(vulnerability))
+					}
 				}
 			}
 		}
