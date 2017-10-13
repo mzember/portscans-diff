@@ -46,7 +46,7 @@ class Rescanner(properties: Properties = Properties()) {
 		val logger = Logger.getLogger(Rescanner::javaClass.name)!!
 	}
 
-	val properties = Properties()
+	private val properties = Properties()
 
 	init {
 		logger.fine("")
@@ -54,7 +54,7 @@ class Rescanner(properties: Properties = Properties()) {
 		(this.properties).putAll(properties)
 	}
 
-	val jiraRestUtil = JiraRestUtil(properties = properties)
+	private val jiraRestUtil = JiraRestUtil(properties = properties)
 
 	fun rescan(issueKey: String) {
 		val issueJSONObject = jiraRestUtil.getIssueJSONObject(issueKey)

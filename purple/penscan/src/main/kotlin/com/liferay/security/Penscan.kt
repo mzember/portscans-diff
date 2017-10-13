@@ -1,4 +1,4 @@
-@file:Suppress("FoldInitializerAndIfToElvis", "LoopToCallChain", "RedundantIf")
+@file:Suppress("FoldInitializerAndIfToElvis", "LoopToCallChain", "RedundantIf", "LiftReturnOrAssignment")
 
 package com.liferay.security
 
@@ -61,7 +61,7 @@ class Penscan(properties: Properties = Properties()) {
 		val logger = Logger.getLogger(Penscan::javaClass.name)!!
 	}
 
-	val properties = Properties()
+	private val properties = Properties()
 
 	init {
 		logger.fine("")
@@ -88,9 +88,11 @@ class Penscan(properties: Properties = Properties()) {
 	private fun attemptVulnerabilityDetections(data: MutableList<MutableMap<String, Any>>) {
 		logger.info("")
 
-		val liferayVulnerabilityDetectionFiles = getResourceFiles(RESOURCE_LIFERAY_VULNERABILITIES_PATH)
+		val liferayVulnerabilityDetectionDir = getResourceDir(RESOURCE_LIFERAY_VULNERABILITIES_PATH)
 
-		checkAndSetVulnerabilitiesData(data, liferayVulnerabilityDetectionFiles)
+		val liferayVulnerabilityDetectionFiles = liferayVulnerabilityDetectionDir.listFiles()
+
+		checkAndSetVulnerabilitiesData(data, liferayVulnerabilityDetectionFiles.toList())
 	}
 
 	private fun associateKnownVulnerabilitiesWithTargets(knownVulnerabilitiesJSONObject: JSONObject, data: MutableList<MutableMap<String, Any>>) {
@@ -421,9 +423,7 @@ class Penscan(properties: Properties = Properties()) {
 			summaryOwner = "${firstName.capitalize()} ${secondName.capitalize()}"
 		}
 
-		val summary = "${vulnerabilitySizeWords.capitalize()} $vulnerabilityWords found on $hostSizeWords $hostWord owned by $summaryOwner"
-
-		return summary
+		return "${vulnerabilitySizeWords.capitalize()} $vulnerabilityWords found on $hostSizeWords $hostWord owned by $summaryOwner"
 	}
 
 	private fun getIpNameStatusMaps(pingScanOutputFile: File): MutableList<MutableMap<String, Any>> {
@@ -469,10 +469,10 @@ class Penscan(properties: Properties = Properties()) {
 
 			val issueFieldsJSONObject = issueJSONObject.get("fields") as JSONObject
 
-			val customfield_IdJSONObject = issueFieldsJSONObject.get("customfield_$jiraTicketScriptLabelsCustomFieldId")
+			val customfieldIdJSONObject = issueFieldsJSONObject.get("customfield_$jiraTicketScriptLabelsCustomFieldId")
 
 			@Suppress("UNCHECKED_CAST")
-			val issueLabels = (customfield_IdJSONObject as JSONArray).toList() as List<String>
+			val issueLabels = (customfieldIdJSONObject as JSONArray).toList() as List<String>
 
 			for (issueLabel in issueLabels) {
 				val hostVulnerabilityLabelRegex = Regex("^host-vulnerability:(.*);(.*)$")
@@ -637,11 +637,9 @@ class Penscan(properties: Properties = Properties()) {
 		logger.fine("")
 
 		for (nameOwnerMap in nameOwnerMaps) {
-			val nameOwner = nameOwnerMap
+			val nameValue = nameOwnerMap["name"] as String
 
-			val nameValue = nameOwner["name"] as String
-
-			val ownerValue = nameOwner["owner"] as String
+			val ownerValue = nameOwnerMap["owner"] as String
 
 			dataKeyValuePutAll(data, "name", nameValue, mapOf("owner" to ownerValue))
 		}

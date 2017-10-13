@@ -4,10 +4,12 @@ import java.io.File
 import java.io.FileNotFoundException
 
 fun getResourceFile(resourcePath: String, fileNameWithoutExtension: String): File {
-	val resourceFiles = getResourceFiles(resourcePath)
+	val resourceDir = getResourceDir(resourcePath)
+
+	val resourceFiles = resourceDir.listFiles()
 
 	for (resourceFile in resourceFiles) {
-		var fileName = resourceFile.getName()
+		var fileName = resourceFile.name
 
 		val pos = fileName.lastIndexOf(".")
 
@@ -15,7 +17,7 @@ fun getResourceFile(resourcePath: String, fileNameWithoutExtension: String): Fil
 			fileName = fileName.substring(0, pos)
 		}
 
-		if (fileName.equals(fileNameWithoutExtension)) {
+		if (fileName == fileNameWithoutExtension) {
 			return resourceFile
 		}
 	}
@@ -23,14 +25,10 @@ fun getResourceFile(resourcePath: String, fileNameWithoutExtension: String): Fil
 	throw FileNotFoundException("Unable to find " + fileNameWithoutExtension + " in " + resourcePath)
 }
 
-fun getResourceFiles(resourcePath: String): MutableList<File> {
+fun getResourceDir(resourcePath: String): File {
 	val classLoader = object {}.javaClass.classLoader
 
 	val resourceURL = classLoader.getResource(resourcePath)!!
 
-	val resourceDirectory = File(resourceURL.file)
-
-	val resourceFiles = resourceDirectory.listFiles()
-
-	return resourceFiles.toMutableList()
+	return File(resourceURL.file)
 }
