@@ -166,6 +166,12 @@ class Penscan(properties: Properties = Properties()) {
 
 				val (vulnerabilityTicket) = matchResult!!.destructured
 
+				val vulnerability = properties.getProperty("vulnerability")
+
+				if ((vulnerability != "") && (vulnerability != vulnerabilityTicket)) {
+					continue
+				}
+
 				val vulnerable: String
 
 				if (isVulnerable(hostBestKeyValue, liferayVulnerabilityDetectionFile.path)) {
