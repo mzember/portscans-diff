@@ -20,6 +20,18 @@ import pl.allegro.finance.tradukisto.ValueConverters
 fun main(args: Array<String>) {
 	val properties = getProperties("penscan.properties")
 
+	if ((args.size % 2) != 0) {
+		throw Exception("Bad args")
+	}
+
+	var i = 0
+
+	while (i < args.size) {
+		properties.setProperty(args[i], args[i + 1])
+
+		i += 2
+	}
+
 	val penscan = Penscan(properties = properties)
 
 	penscan.penscan()
