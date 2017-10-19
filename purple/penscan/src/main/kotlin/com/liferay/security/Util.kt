@@ -1,6 +1,6 @@
 @file:Suppress("LiftReturnOrAssignment")
 
-import com.liferay.security.exec
+package com.liferay.security
 
 import java.io.ByteArrayOutputStream
 import java.io.File

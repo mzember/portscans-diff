@@ -5,11 +5,6 @@ import java.util.logging.Logger
 
 import org.json.JSONObject
 
-import getIssueJSONObject
-import getProperties
-import getResourceFile
-import isVulnerable
-
 fun main(args: Array<String>) {
 	if (args.isEmpty()) {
 		println("You must specify a JIRA ticket. For example: \"-Pticket=LRINFOSEC-123\"")

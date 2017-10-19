@@ -2,7 +2,6 @@
 
 package com.liferay.security
 
-import getProperties
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.text.SimpleDateFormat
@@ -17,9 +16,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 import pl.allegro.finance.tradukisto.ValueConverters
-
-import getResourceDir
-import isVulnerable
 
 fun main(args: Array<String>) {
 	val properties = getProperties("penscan.properties")
