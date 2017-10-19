@@ -1,19 +1,22 @@
-To run, ```./gradlew run```.
+To run: 
 
-To test, ```./gradlew test```.
+```./gradlew run```
 
-To use on prod, add ```penscan-ext.properties``` with the following properties set
-```
-jiraHost
-jiraPassword
-jiraUsername
-```
+To run, testing a single vulnerability: 
 
-Then, ```./gradlew run```.
+```./gradlew run -Pvulnerability=LSV-0```
 
-To use with your own credentials on UAT, add ```penscan-ext.properties``` with the following properties set
+To run, testing all host vulnerabilities associated with a ticket: 
+
+```./gradlew rescan -Pticket=LRINFOSEC-0```
+
+To test: 
+
+```./gradlew test```
+
+Create ```penscan-ext.properties``` with:
 ```
-jiraPassword
-jiraUsername
+jiraHost=
+jiraPassword=
+jiraUsername=
 ```
-Then, ```./gradlew run```.
