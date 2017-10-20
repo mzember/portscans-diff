@@ -168,7 +168,7 @@ class Penscan(properties: Properties = Properties()) {
 
 				val vulnerability = properties.getProperty("vulnerability")
 
-				if ((vulnerability != "") && (vulnerability != vulnerabilityTicket)) {
+				if (!vulnerability.isNullOrEmpty() && (vulnerability != vulnerabilityTicket)) {
 					continue
 				}
 
