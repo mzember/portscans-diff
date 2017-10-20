@@ -52,6 +52,11 @@ task rescan(type: JavaExec) {
 	if (project.hasProperty('ticket')) {
 		args(ticket)
 	}
+
+	if (project.hasProperty('vulnerability')) {
+		args("vulnerability")
+		args(vulnerability)
+	}
 }
 
 task wrapper(type: Wrapper) {

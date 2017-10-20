@@ -14,6 +14,18 @@ fun main(args: Array<String>) {
 
 	val properties = getProperties("penscan.properties")
 
+	if ((args.size % 2) != 1) {
+		throw Exception("Bad args")
+	}
+
+	var i = 1
+
+	while (i < args.size) {
+		properties.setProperty(args[i], args[i + 1])
+
+		i += 2
+	}
+
 	val rescanner = Rescanner(properties)
 
 	rescanner.rescan(args[0])
