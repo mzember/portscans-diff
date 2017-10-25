@@ -14,11 +14,11 @@ fun main(args: Array<String>) {
 
 	val properties = getProperties("penscan.properties")
 
-	if ((args.size % 2) != 1) {
+	if ((args.size % 2) != 0) {
 		throw Exception("Bad args")
 	}
 
-	var i = 1
+	var i = 0
 
 	while (i < args.size) {
 		properties.setProperty(args[i], args[i + 1])
@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
 
 	val rescanner = Rescanner(properties)
 
-	rescanner.rescan(args[0])
+	rescanner.rescan()
 }
 
 class Rescanner(properties: Properties = Properties()) {
@@ -44,14 +44,15 @@ class Rescanner(properties: Properties = Properties()) {
 		(this.properties).putAll(properties)
 	}
 
-	fun rescan(issueKey: String) {
+	fun rescan() {
 		logger.info("")
 
+		val ticket: String by properties
 		val jiraHost: String by properties
 		val jiraPassword: String by properties
 		val jiraUsername: String by properties
 
-		val issueJSONObject = getIssueJSONObject(issueKey, jiraHost, jiraPassword, jiraUsername)
+		val issueJSONObject = getIssueJSONObject(ticket, jiraHost, jiraPassword, jiraUsername)
 
 		val issueHostVulnerabilities = getIssueHostVulnerabilities(issueJSONObject)
 
@@ -82,9 +83,9 @@ class Rescanner(properties: Properties = Properties()) {
 				val host = hostVulnerabilityArray[0]
 				val vulnerability = getActualVulnerability(hostVulnerabilityArray[1])
 
-				val scanVulnerability = properties.getProperty("vulnerability")
+				val rescanVulnerability = properties.getProperty("vulnerability")
 
-				if (!scanVulnerability.isNullOrEmpty() && (scanVulnerability != vulnerability)) {
+				if (!rescanVulnerability.isNullOrEmpty() && (rescanVulnerability != vulnerability)) {
 					continue
 				}
 

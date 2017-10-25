@@ -49,14 +49,7 @@ task rescan(type: JavaExec) {
 
 	main = 'com.liferay.security.RescannerKt'
 
-	if (project.hasProperty('ticket')) {
-		args(ticket)
-	}
-
-	if (project.hasProperty('vulnerability')) {
-		args("vulnerability")
-		args(vulnerability)
-	}
+	args = run.args
 }
 
 task wrapper(type: Wrapper) {
