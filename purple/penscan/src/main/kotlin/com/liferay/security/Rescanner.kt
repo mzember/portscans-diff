@@ -68,7 +68,7 @@ class Rescanner(properties: Properties = Properties()) {
 				val hostVulnerabilityArray = hostVulnerability.split(";")
 
 				val host = hostVulnerabilityArray[0]
-				val vulnerability = hostVulnerabilityArray[1]
+				val vulnerability = getActualVulnerability(hostVulnerabilityArray[1])
 
 				val vulnerabilityDetectionFile = getResourceFile(vulnerability, RESOURCE_LIFERAY_VULNERABILITIES_PATH)
 

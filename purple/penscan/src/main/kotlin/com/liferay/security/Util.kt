@@ -9,6 +9,14 @@ import java.util.Properties
 
 import org.json.JSONObject
 
+fun getActualVulnerability(vulnerability: String): String {
+	if (vulnerability == "LSV-322") {
+		return "LSV-329"
+	}
+
+	return vulnerability
+}
+
 fun getIssueJSONObject(issueKey: String, jiraHost: String, jiraPassword: String, jiraUsername: String): JSONObject {
 	val url = "https://$jiraHost/rest/api/2/issue/$issueKey"
 

@@ -476,7 +476,7 @@ class Penscan(properties: Properties = Properties()) {
 					continue
 				}
 
-				vulnerabilities.add(vulnerability)
+				vulnerabilities.add(getActualVulnerability(vulnerability))
 			}
 		}
 
