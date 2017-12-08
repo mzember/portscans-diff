@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+	<actions/>
+	<description></description>
+	<keepDependencies>false</keepDependencies>
+	<properties>
+		<hudson.model.ParametersDefinitionProperty>
+			<parameterDefinitions>
+				<hudson.model.StringParameterDefinition>
+					<name>ticket</name>
+					<description></description>
+					<defaultValue></defaultValue>
+				</hudson.model.StringParameterDefinition>
+			</parameterDefinitions>
+		</hudson.model.ParametersDefinitionProperty>
+	</properties>
+	<scm class="hudson.plugins.git.GitSCM" plugin="git@3.6.4">
+		<configVersion>2</configVersion>
+		<userRemoteConfigs>
+			<hudson.plugins.git.UserRemoteConfig>
+				<url>git@github.com:liferay/lfris-security.git</url>
+			</hudson.plugins.git.UserRemoteConfig>
+		</userRemoteConfigs>
+		<branches>
+			<hudson.plugins.git.BranchSpec>
+				<name>master</name>
+			</hudson.plugins.git.BranchSpec>
+		</branches>
+		<doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+		<submoduleCfg class="list"/>
+		<extensions/>
+	</scm>
+	<canRoam>true</canRoam>
+	<disabled>false</disabled>
+	<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+	<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+	<triggers/>
+	<concurrentBuild>false</concurrentBuild>
+	<builders>
+		<hudson.tasks.Shell>
+			<command>cd purple/penscan
+				echo &quot;jiraPassword=$JIRA_PASSWORD&quot; &gt; penscan-ext.properties
+				echo &quot;jiraUsername=$JIRA_USERNAME&quot; &gt;&gt; penscan-ext.properties
+				echo &quot;jiraHost=issues.liferay.com&quot; &gt;&gt; penscan-ext.properties
+				./gradlew clean --rerun-tasks rescan -Pticket=$ticket</command>
+		</hudson.tasks.Shell>
+	</builders>
+	<publishers/>
+	<buildWrappers>
+		<org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper plugin="credentials-binding@1.13">
+			<bindings>
+				<org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+					<credentialsId>45d18d2e-20a9-46bf-b1ce-026a3dd5213d</credentialsId>
+					<usernameVariable>JIRA_USERNAME</usernameVariable>
+					<passwordVariable>JIRA_PASSWORD</passwordVariable>
+				</org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+			</bindings>
+		</org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>
+	</buildWrappers>
+</project>
