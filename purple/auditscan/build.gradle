@@ -1,0 +1,48 @@
+buildscript {
+	ext.kotlin_version = '1.1.1'
+	repositories {
+		mavenCentral()
+		jcenter()
+	}
+	dependencies {
+		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+	}
+}
+
+apply plugin: 'idea'
+apply plugin: 'kotlin'
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+sourceSets {
+	main.kotlin.srcDirs += '../penscan/src/main/kotlin'
+}
+
+mainClassName = 'com.liferay.security.AuditscanKt'
+
+defaultTasks 'run'
+
+run {
+	args(projectDir, 'www.liferay.com')
+
+	systemProperties = ['java.util.logging.SimpleFormatter.format': '%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4\$-6s %2$s %5$s%6$s%n']
+}
+
+compileKotlin {
+	kotlinOptions.freeCompilerArgs = ['-Xskip-runtime-version-check']
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	compile "org.json:json:20170516"
+	compile "pl.allegro.finance:tradukisto:1.0.0"
+	compile "org.jetbrains.kotlin:kotlin-script-util:$kotlin_version"
+	testCompile "org.spockframework:spock-core:1.0-groovy-2.4"
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.0'
+}
