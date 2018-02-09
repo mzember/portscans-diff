@@ -85,7 +85,7 @@ class Auditscan() {
 
 		exec("git", args)
 
-		args = mutableListOf("push", "origin", "master")
+		args = mutableListOf("push", "origin", "HEAD:master")
 
 		exec("git", args)
 	}
