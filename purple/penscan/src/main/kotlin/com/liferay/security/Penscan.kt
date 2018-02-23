@@ -374,7 +374,7 @@ class Penscan(properties: Properties = Properties()) {
 
 		val recycleCandidateDate = SimpleDateFormat("EEEE, MMMM dd, yyyy").format(twoWeeksTime)
 
-		description += "If you don't respond to us on this ticket within two weeks (by $recycleCandidateDate), the above VM resources will be deactivated until the issue can be resolved.\\n"
+		description += "If you are the owner of the affected system(s), it is your responsibility to either\n# Fix the issue\n# Delegate to fix the issue\n# Explain why the fix cannot or should not be implemented now\nOnce you understand your responsibilities, please reply saying you are looking into it.  If two weeks pass without acknowledgement (by $recycleCandidateDate) the security team has authority to deactivate the above VM resources.\n\nIf you are not the owner, add a comment with \"I am not the owner\".  If you know who the owner is, please add a comment saying who.\n\nThe IS Security team is here to help.  If you are unsure how to secure these systems or have other questions/comments about the above please add them here or send an email to is-security@liferay.com"
 
 		return description
 	}
