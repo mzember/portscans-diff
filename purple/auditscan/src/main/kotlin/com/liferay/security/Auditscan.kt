@@ -16,6 +16,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 import pl.allegro.finance.tradukisto.ValueConverters
+import java.net.HttpURLConnection
 
 fun main(args: Array<String>) {
 	if (args.size != 2) {
@@ -24,7 +25,8 @@ fun main(args: Array<String>) {
 
 	val auditscan = Auditscan()
 
-	auditscan.scan(args[0], args[1])
+	auditscan.commitHTTPScoreReport(args[0], args[1])
+	auditscan.commitSPFScoreReport(args[0], args[1])
 }
 
 class Auditscan() {
@@ -32,10 +34,10 @@ class Auditscan() {
 		val logger = Logger.getLogger(Auditscan::javaClass.name)!!
 	}
 
-	fun scan(projectDir: String, siteURL: String) {
+	fun commitHTTPScoreReport(projectDir: String, siteURL: String) {
 		logger.fine("")
 
-		val response = sendRequest(siteURL)
+		val response = createHTTPScoreReport(siteURL)
 
 		val jsonObject = JSONObject(response)
 
@@ -55,7 +57,27 @@ class Auditscan() {
 
 		appendCSV(csvFile, resultsMap)
 
-		pushCSV(csvFile)
+		commit(csvFile, "LRINFOSEC-192 Generated HTTP Score Report")
+	}
+
+	fun commitSPFScoreReport(projectDir: String, siteURL: String) {
+		logger.fine("")
+
+		var result = "fail"
+
+		val response = createSPFScoreReport(siteURL)
+
+		println("response = ${response}")
+
+		if (response.contains("pass")) {
+			result = "pass"
+		}
+
+		val csvFile = File(projectDir + "/reports/spf_scores/" + siteURL + ".csv")
+
+		csvFile.appendText("\r\n" + siteURL + ',' + result)
+
+		commit(csvFile, "LRINFOSEC-192 Generated SPF Score Report")
 	}
 
 	private fun appendCSV(csvFile: File, resultsMap: Map<String, Int>) {
@@ -72,12 +94,12 @@ class Auditscan() {
 		csvFile.appendText("\r\n" + row.joinToString(","))
 	}
 
-	private fun pushCSV(csvFile: File) {
-		var args = mutableListOf("add", csvFile.getCanonicalPath())
+	private fun commit(file: File, message: String) {
+		var args = mutableListOf("add", file.getCanonicalPath())
 
 		exec("git", args)
 
-		args = mutableListOf("commit", "-m", "LRINFOSEC-192 auto audit scan")
+		args = mutableListOf("commit", "-m", message)
 
 		exec("git", args)
 
@@ -90,7 +112,7 @@ class Auditscan() {
 		exec("git", args)
 	}
 
-	private fun sendRequest(siteURL: String): String {
+	private fun createHTTPScoreReport(siteURL: String): String {
 		logger.fine("")
 
 		val response = StringBuffer()
@@ -98,6 +120,34 @@ class Auditscan() {
 		val url = URL("https://httpsecurityreport.com/analyze?url=" + siteURL)
 
 		val connection = url.openConnection()
+
+		val bufferedReader = BufferedReader(InputStreamReader(connection.getInputStream()))
+
+		var input = bufferedReader.readLine()
+
+		while (input != null) {
+			response.append(input)
+
+			input = bufferedReader.readLine()
+		}
+
+		bufferedReader.close()
+
+		logger.finest("Response: " + response.toString())
+
+		return response.toString()
+	}
+
+	private fun createSPFScoreReport(siteURL: String): String {
+		logger.fine("")
+
+		val response = StringBuffer()
+
+		val url = URL("http://www.kitterman.com/getspf2.py?domain=$siteURL&serial=fred12")
+
+		val connection = url.openConnection() as HttpURLConnection
+
+		connection.requestMethod = "POST"
 
 		val bufferedReader = BufferedReader(InputStreamReader(connection.getInputStream()))
 
