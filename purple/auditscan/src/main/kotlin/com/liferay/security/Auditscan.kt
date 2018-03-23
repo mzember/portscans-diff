@@ -75,7 +75,7 @@ class Auditscan() {
 
 		val csvFile = File(projectDir + "/reports/spf_scores/" + siteURL + ".csv")
 
-		csvFile.appendText("\r\n" + siteURL + ',' + result)
+		csvFile.appendText("\r\n" + SimpleDateFormat("yyyy-MM-dd").format(Date()) + ',' + siteURL + ',' + result)
 
 		commit(csvFile, "LRINFOSEC-192 Generated SPF Score Report")
 	}
