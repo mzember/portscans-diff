@@ -317,9 +317,13 @@ class Penscan(properties: Properties = Properties()) {
 
 		val byteArrayOutputStream = ByteArrayOutputStream()
 
-		exec("curl", args, standardOutput = byteArrayOutputStream, skipPrintCommandLine = true)
+		val exitValue = exec("curl", args, standardOutput = byteArrayOutputStream, skipPrintCommandLine = true, exceptionOnExitValue = false)
 
 		val byteArrayOutputString = byteArrayOutputStream.toString()
+
+		if (exitValue != 0) {
+			throw Exception("Create ticket failed with error: " + byteArrayOutputString)
+		}
 
 		val jsonObject = JSONObject(byteArrayOutputString)
 
