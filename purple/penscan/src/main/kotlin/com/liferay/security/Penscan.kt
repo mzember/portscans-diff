@@ -241,9 +241,13 @@ class Penscan(properties: Properties = Properties()) {
 
 						logger.info("$host vulnerable to $vulnerabilityName")
 
-						val scriptLabel = "host-vulnerability:$host;$vulnerabilityName"
+						val hostVulnerabilityScriptLabel = "host-vulnerability:$host;$vulnerabilityName"
 
-						scriptLabels.add(scriptLabel)
+						scriptLabels.add(hostVulnerabilityScriptLabel)
+
+						val vulnerabilityScriptLabel = "vulnerability:$vulnerabilityName"
+
+						scriptLabels.add(vulnerabilityScriptLabel)
 
 						hosts.add(host)
 
