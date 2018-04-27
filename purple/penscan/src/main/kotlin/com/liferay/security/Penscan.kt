@@ -331,6 +331,10 @@ class Penscan(properties: Properties = Properties()) {
 
 		val jsonObject = JSONObject(byteArrayOutputString)
 
+		if (!jsonObject.has("key")) {
+			throw Exception("JIRA API response error: " + jsonObject.toString())
+		}
+
 		val jiraTicket = jsonObject.get("key")
 
 		return jiraTicket as String
@@ -382,7 +386,7 @@ class Penscan(properties: Properties = Properties()) {
 
 		val recycleCandidateDate = SimpleDateFormat("EEEE, MMMM dd, yyyy").format(twoWeeksTime)
 
-		description += "If you are the owner of the affected system(s), it is your responsibility to either\n# Fix the issue\n# Delegate to fix the issue\n# Explain why the fix cannot or should not be implemented now\nOnce you understand your responsibilities, please reply saying you are looking into it.  If two weeks pass without acknowledgement (by $recycleCandidateDate) the security team has authority to deactivate the above VM resources.\n\nIf you are not the owner, add a comment with \"I am not the owner\".  If you know who the owner is, please add a comment saying who.\n\nThe IS Security team is here to help.  If you are unsure how to secure these systems or have other questions/comments about the above please add them here or send an email to is-security@liferay.com\n\nNote: The issue for each column above is a clickable link where you can find the issue description, and the most common path to fix these issues is by updating your system to the most recent fix pack version."
+		description += "If you are the owner of the affected system(s), it is your responsibility to either\\n# Fix the issue\\n# Delegate to fix the issue\\n# Explain why the fix cannot or should not be implemented now\\nOnce you understand your responsibilities, please reply saying you are looking into it.  If two weeks pass without acknowledgement (by $recycleCandidateDate) the security team has authority to deactivate the above VM resources.\\n\\nIf you are not the owner, add a comment with _I am not the owner_.  If you know who the owner is, please add a comment saying who.\\n\\nThe IS Security team is here to help.  If you are unsure how to secure these systems or have other questions/comments about the above please add them here or send an email to is-security@liferay.com\\n\\nNote: The issue for each column above is a clickable link where you can find the issue description, and the most common path to fix these issues is by updating your system to the most recent fix pack version."
 
 		return description
 	}
