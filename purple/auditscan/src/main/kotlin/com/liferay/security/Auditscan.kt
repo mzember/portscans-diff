@@ -19,14 +19,14 @@ import pl.allegro.finance.tradukisto.ValueConverters
 import java.net.HttpURLConnection
 
 fun main(args: Array<String>) {
-	if (args.size != 2) {
+	if (args.size > 2 || args.size < 1) {
 		throw Exception("Bad args")
 	}
 
 	val auditscan = Auditscan()
 
-	auditscan.commitHTTPScoreReport(args[0], args[1])
-	auditscan.commitSPFScoreReport(args[0], args[1])
+	auditscan.commitHTTPScoreReport(args[0], "www.liferay.com")
+	auditscan.commitSPFScoreReport(args[0], "liferay.com")
 }
 
 class Auditscan() {
