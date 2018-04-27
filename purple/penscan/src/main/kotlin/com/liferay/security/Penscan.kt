@@ -55,7 +55,7 @@ class Penscan(properties: Properties = Properties()) {
 
 		val data = mutableListOf<MutableMap<String, Any>>()
 
-		aquireTargets(data)
+		acquireTargets(data)
 		associateOwnersWithTargets(data)
 		attemptVulnerabilityDetections(data)
 
@@ -129,7 +129,7 @@ class Penscan(properties: Properties = Properties()) {
 		setOwnersData(data, nameOwnerMaps)
 	}
 
-	private fun aquireTargets(data: MutableList<MutableMap<String, Any>>) {
+	private fun acquireTargets(data: MutableList<MutableMap<String, Any>>) {
 		logger.info("")
 
 		val nmapIpNameStatusMaps = getNmapIpNameStatusMaps()
