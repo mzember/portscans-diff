@@ -19,7 +19,7 @@ import pl.allegro.finance.tradukisto.ValueConverters
 import java.net.HttpURLConnection
 
 fun main(args: Array<String>) {
-	if (args.size > 2 || args.size < 1) {
+	if ((args.size > 2) || (args.size < 1)) {
 		throw Exception("Bad args")
 	}
 
