@@ -432,6 +432,8 @@ class Penscan(properties: Properties = Properties()) {
 
 		val pingScanGreppableOutputLineRegex = Regex("^Host: (.*) \\((.*)\\)\\tStatus: (.*)$")
 
+		val scanResultsSB = StringBuilder()
+
 		val pingScanOutputLines = pingScanOutputFile.readLines()
 
 		for (pingScanOutputLine in pingScanOutputLines) {
@@ -443,6 +445,8 @@ class Penscan(properties: Properties = Properties()) {
 
 			val (ip, name, status) = matchResult.destructured
 
+			scanResultsSB.append("IP: " + ip + " Name: " + name + " Status: " + status + "\n")
+
 			val ipNameStatusMap = hashMapOf<String, Any>(
 				"ip" to ip,
 				"name" to name,
@@ -450,6 +454,8 @@ class Penscan(properties: Properties = Properties()) {
 
 			ipNameStatusMaps.add(ipNameStatusMap)
 		}
+
+		logger.info("Nmap scan results:\n" + scanResultsSB.toString())
 
 		return ipNameStatusMaps
 	}
@@ -539,9 +545,17 @@ class Penscan(properties: Properties = Properties()) {
 
 		val nmapTargetSpecificationFile = File("nmapTargetSpecification")
 
-		val byteArrayOutputStream = ByteArrayOutputStream()
+		val nmapTargetSpecificationFileContentSB = StringBuilder()
 
-		exec("nmap", listOf("-oG", pingScanOutputFile.path, "-iL", nmapTargetSpecificationFile.path, "-sn"), standardOutput = byteArrayOutputStream, skipPrintCommandLine = true)
+		val nmapTargetSpecificationFileLines = nmapTargetSpecificationFile.readLines()
+
+		for (nmapTargetSpecificationFileLine in nmapTargetSpecificationFileLines) {
+			nmapTargetSpecificationFileContentSB.append(nmapTargetSpecificationFileLine + "\n")
+		}
+
+		logger.info("Scanning the following IP ranges with nmap:\n" + nmapTargetSpecificationFileContentSB.toString())
+
+		exec("nmap", listOf("--packet-trace", "-oG", pingScanOutputFile.path, "-iL", nmapTargetSpecificationFile.path, "-sn"), skipPrintCommandLine = true)
 
 		return getIpNameStatusMaps(pingScanOutputFile)
 	}
