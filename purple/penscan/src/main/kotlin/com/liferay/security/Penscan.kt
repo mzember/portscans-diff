@@ -181,6 +181,8 @@ class Penscan(properties: Properties = Properties()) {
 					vulnerable = "no"
 				}
 
+				logger.info(hostBestKeyValue + " was scanned for " + vulnerabilityTicket + "; Vulnerable: " + vulnerable)
+
 				vulnerabilities.add(mutableMapOf("name" to vulnerabilityTicket, "vulnerable" to vulnerable))
 			}
 
