@@ -73,7 +73,11 @@ class Penscan(properties: Properties = Properties()) {
 
 		val liferayVulnerabilityDetectionFiles = liferayVulnerabilityDetectionDir.listFiles()
 
-		checkAndSetVulnerabilitiesData(data, liferayVulnerabilityDetectionFiles.toList())
+		val publicLiferayVulnerabilityDetectionDir = getResourceDir(RESOURCE_LIFERAY_VULNERABILITIES_PATH + "/public")
+
+		val publicLiferayVulnerabilityDetectionFiles = publicLiferayVulnerabilityDetectionDir.listFiles()
+
+		checkAndSetVulnerabilitiesData(data, liferayVulnerabilityDetectionFiles.toList(), publicLiferayVulnerabilityDetectionFiles.toList())
 	}
 
 	private fun associateKnownVulnerabilitiesWithTargets(knownVulnerabilitiesJSONObject: JSONObject, data: MutableList<MutableMap<String, Any>>) {
@@ -145,7 +149,7 @@ class Penscan(properties: Properties = Properties()) {
 		data.addAll(ipNameStatusMapsExt)
 	}
 
-	private fun checkAndSetVulnerabilitiesData(data: MutableList<MutableMap<String, Any>>, liferayVulnerabilityDetectionFiles: List<File>) {
+	private fun checkAndSetVulnerabilitiesData(data: MutableList<MutableMap<String, Any>>, liferayVulnerabilityDetectionFiles: List<File>, publicLiferayVulnerabilityDetectionFiles: List<File>) {
 		logger.fine("")
 
 		for (datum in data) {
@@ -159,7 +163,17 @@ class Penscan(properties: Properties = Properties()) {
 
 			val hostBestKeyValue = datum[hostBestKey] as String
 
-			for (liferayVulnerabilityDetectionFile in liferayVulnerabilityDetectionFiles) {
+			val scannableLiferayVulnerabilityDetectionFiles = liferayVulnerabilityDetectionFiles.toMutableList()
+
+			if (datum["type"] == "Public") {
+				scannableLiferayVulnerabilityDetectionFiles.addAll(publicLiferayVulnerabilityDetectionFiles)
+			}
+
+			for (liferayVulnerabilityDetectionFile in scannableLiferayVulnerabilityDetectionFiles) {
+				if (liferayVulnerabilityDetectionFile.isDirectory()) {
+					continue;
+				}
+
 				val vulnerabilityDetectionFileNameRegex = Regex("([A-Z]+-[0-9]+)\\..*")
 
 				val matchResult = vulnerabilityDetectionFileNameRegex.matchEntire(liferayVulnerabilityDetectionFile.name)
