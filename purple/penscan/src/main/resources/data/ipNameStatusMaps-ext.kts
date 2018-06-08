@@ -11,7 +11,6 @@ listOf(mapOf("name" to "community.liferay.com", "status" to "Up", "type" to "Pub
 	mapOf("name" to "hris.liferay.com", "status" to "Up", "type" to "Public"),
 	mapOf("name" to "in.liferay.com", "status" to "Up", "type" to "Public"),
 	mapOf("name" to "issues.liferay.com", "status" to "Up", "type" to "Public"),
-	mapOf("name" to "lfr.ai", "status" to "Up", "type" to "Public"),
 	mapOf("name" to "loop.liferay.com", "status" to "Up", "type" to "Public"),
 	mapOf("name" to "patcher.liferay.com", "status" to "Up", "type" to "Public"),
 	mapOf("name" to "reports.liferay.com", "status" to "Up", "type" to "Public"),
