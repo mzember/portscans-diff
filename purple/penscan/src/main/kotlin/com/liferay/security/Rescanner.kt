@@ -56,9 +56,17 @@ class Rescanner(properties: Properties = Properties()) {
 
 		val issueHostVulnerabilities = getIssueHostVulnerabilities(issueJSONObject)
 
-		val issueHostVulnerabilitiesJSONObject = JSONObject(issueHostVulnerabilities)
+		println("{panel:title=Rescan Vulnerabilities}")
 
-		println(issueHostVulnerabilitiesJSONObject.toString(4))
+		for ((key, value) in issueHostVulnerabilities.toSortedMap()) {
+			value.sort()
+
+			val valueString = value.joinToString("], [", "[", "]")
+
+			println("$key: $valueString")
+		}
+
+		println("{panel}")
 	}
 
 	private fun getIssueHostVulnerabilities(jiraIssueJSONObject: JSONObject): MutableMap<String, MutableList<String>> {
