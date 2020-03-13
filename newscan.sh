@@ -4,7 +4,7 @@ mkdir "$DIR"
 cp Targets.IP "$DIR"
 (
 cd "$DIR"
-../run-nmap-Tfast-test.sh
+sh -x ../run-nmap-Tfast-test.sh
 )
 
-./diffscans.sh
+sh -x ./diffscans.sh
