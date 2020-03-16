@@ -8,7 +8,7 @@ else
 fi
 (
 cd "$DIR"
-sh -x ../run-nmap-Tfast-test.sh
+sh -x ../run-nmap-Tall-normal.sh
 )
 
 sh -x ./diffscans.sh
